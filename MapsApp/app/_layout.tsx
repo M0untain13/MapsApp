@@ -6,8 +6,11 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
-import App from './app';
 import { useColorScheme } from '@/hooks/useColorScheme';
+
+import Map from '@/components/Map';
+import { MarkerProvider } from '@/components/MarkerProvider';
+import { RegionProvider } from '@/components/RegionProvider';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -30,8 +33,15 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <App />
-      <StatusBar style="auto" />
+      <MarkerProvider>
+        <RegionProvider>
+          <Stack>
+            <Stack.Screen name="index" options={{ title: 'Карта' }} />
+            <Stack.Screen name="marker/[id]" options={{ title: 'Маркер' }} />
+            <StatusBar style="auto" />
+          </Stack>
+        </RegionProvider>
+      </MarkerProvider>
     </ThemeProvider>
   );
 }
