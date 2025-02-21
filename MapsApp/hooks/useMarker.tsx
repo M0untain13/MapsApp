@@ -1,5 +1,6 @@
 import { useMarkerContext } from '@/components/MarkerProvider';
 import * as ImagePicker from 'expo-image-picker';
+import 'react-native-get-random-values';
 import { v4 as uuid } from 'uuid'
 
 const useMarker = (id: string) => {
@@ -21,20 +22,21 @@ const useMarker = (id: string) => {
         quality: 1,
       });
 
-      let newImage = {
-        id: uuid(),
-        uri: result.uri,
-      };
-
-      if (!result.canceled) {
-        updateMarker(marker.id, { ...marker, images: [...marker.images, newImage] });
-      }
+      result.assets?.map(async (asset) => {
+        let newImage = {
+          id: uuid(),
+          url: asset.uri,
+        };
+        if (!result.canceled) {
+          updateMarker(marker.id, { ...marker, images: [...marker.images, newImage] });
+        }
+      })
     }
   };
 
   const removeImage = (imageId: string) => {
     if (marker) {
-      updateMarker(marker.id, { ...marker, images: [] });
+      updateMarker(marker.id, { ...marker, images: marker.images.filter(i => i.id !== imageId) });
     }
   };
 

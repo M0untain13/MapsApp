@@ -5,11 +5,11 @@ import { useRouter } from 'expo-router';
 import { MarkerData } from '@/types';
 import { useMarkerContext } from '@/components/MarkerProvider';
 import { useRegionContext } from './RegionProvider';
+import 'react-native-get-random-values';
 import { v4 as uuid } from 'uuid'
 
 const Map = () => {
   const router = useRouter();
-
   const { markers, setMarkers } = useMarkerContext();
   const { region, setRegion } = useRegionContext();
 
