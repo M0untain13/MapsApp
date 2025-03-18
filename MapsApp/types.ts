@@ -1,17 +1,23 @@
-export interface MarkerData {
-    id: string;
-    latitude: number;
-    longitude: number;
-    images: ImageData[];
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+
+@Entity()
+export class MarkerData {
+    @PrimaryGeneratedColumn()
+    id!: string;
+    @Column('int', {nullable:false})
+    latitude!: number;
+    @Column('int', {nullable:false})
+    longitude!: number;
 }
 
-export interface ImageData {
-    id: string;
-    url: string;
-}
-
-export interface NavigationParams {
-    id: string;
+@Entity()
+export class ImageData {
+    @PrimaryGeneratedColumn()
+    id!: string;
+    @Column('text', {nullable:false})
+    url!: string;
+    @Column('text', {nullable:false})
+    markerId!: string;
 }
 
 export interface Region {

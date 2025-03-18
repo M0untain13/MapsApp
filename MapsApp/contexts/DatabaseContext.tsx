@@ -1,5 +1,7 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { MarkerData, ImageData } from '@/types';
+import { Session } from './ConnectSession';
+import { DataSource } from 'typeorm';
 
 interface DatabaseContextType {
   addMarker: (latitude: number, longitude: number) => Promise<void>;
@@ -12,25 +14,72 @@ interface DatabaseContextType {
 }
 
 export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
-    const addMarker = async (latitude: number, longitude: number) => {
-
+    const initDatabase = async () => {
+        Session(async (datasource : DataSource) => {
+            await datasource.initialize();
+        })
     }
-    const deleteMarker = async (id: number) => {
+    useEffect(() => {initDatabase()}, [])
 
+    const addMarker = async (latitude: number, longitude: number) => {
+        Session(async (datasource : DataSource) => {
+            const markerRepository = datasource.getRepository(MarkerData);
+            const marker = new MarkerData();
+            marker.latitude = latitude;
+            marker.longitude = longitude;
+            await markerRepository.save(marker);
+        })
+    }
+    const deleteMarker = async (id: string) => {
+        Session(async (datasource : DataSource) => {
+            const imageRepository = datasource.getRepository(ImageData);
+            const markerRepository = datasource.getRepository(MarkerData);
+
+            const images = await imageRepository.find({ where: { markerId: id } });
+            await imageRepository.remove(images);
+
+            const marker = await markerRepository.findOne({ where: { id: id } });
+            if (marker) {
+                await markerRepository.remove(marker);
+            }
+        })
     }
     const getMarkers = async () => {
-        return [];
+        let markers : MarkerData[] = [];
+        Session(async (datasource : DataSource) => {
+            const markerRepository = datasource.getRepository(MarkerData);
+            markers = await markerRepository.find();
+        })
+        return markers;
     }
 
-    const addImage = async (markerId: number, uri: string) => {
+    const addImage = async (markerId: string, uri: string) => {
+        Session(async (datasource : DataSource) => {
+            const imageRepository = datasource.getRepository(ImageData);
+            const image = new ImageData();
+            image.url = uri;
+            image.markerId = markerId;
+            await imageRepository.save(image);
+        })
+    }
+    const deleteImage = async (id: string) => {
+        Session(async (datasource : DataSource) => {
+            const imageRepository = datasource.getRepository(ImageData);
+            const image = await imageRepository.findOne({ where: { id: id } });
+            if (image) {
+                await imageRepository.remove(image);
+            }
+        })
+    }
+    const getMarkerImages = async (markerId: string) => {
+        let images : ImageData[] = [];
+        Session(async (datasource : DataSource) => {
+            const imageRepository = datasource.getRepository(ImageData);
+            images = await imageRepository.find({ where: { markerId: markerId } });
+        })
+        return images;
+    }
 
-    }
-    const deleteImage = async (id: number) => {
-
-    }
-    const getMarkerImages = async (markerId: number) => {
-        return [];
-    }
     return (
         <DatabaseContext.Provider value={{addMarker, deleteMarker, getMarkers, addImage, deleteImage, getMarkerImages}}>
             {children}
