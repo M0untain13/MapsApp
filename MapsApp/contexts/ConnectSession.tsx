@@ -5,12 +5,11 @@ export const Session: (action: (datasource: DataSource) => Promise<void>) => voi
         type: "sqlite",
         database: "test.db",
         entities: [
-            __dirname + "/entity/*.js"
+            __dirname + "/entity/*.ts"
         ],
         synchronize: true,
         logging: false
     }).then(connection => {
         action(connection);
-        connection.close();
     }).catch(error => console.log(error));
 }

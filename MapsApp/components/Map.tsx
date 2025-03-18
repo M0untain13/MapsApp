@@ -19,6 +19,7 @@ const Map = () => {
   useEffect(() => {firstFillMarkers()}, [])
 
   const handleLongPress = async (e: any) => {
+    alert("Нажато")
     const { latitude, longitude } = e.nativeEvent.coordinate;
     addMarker(latitude, longitude);
     setMarkers(await getMarkers())
