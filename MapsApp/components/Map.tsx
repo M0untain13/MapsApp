@@ -9,9 +9,9 @@ import 'react-native-get-random-values';
 
 const Map = () => {
   const router = useRouter();
-  const { addMarker, getMarkers } = useDatabaseContext();
   const { region, setRegion } = useRegionContext();
   const [ markers, setMarkers ] = useState<MarkerData[]>([]);
+  const { addMarker, getMarkers } = useDatabaseContext();
 
   const firstFillMarkers = async () => {
     setMarkers(await getMarkers());
