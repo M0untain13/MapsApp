@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
-import { Region } from '@/types';
+import { Region } from '@/models/Region';
 
 interface RegionContextType {
     region: Region;

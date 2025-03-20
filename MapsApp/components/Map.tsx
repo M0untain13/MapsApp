@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { useRouter } from 'expo-router';
-import { MarkerData } from '@/types';
+import { MarkerData } from '@/models/MarkerData';
 import { useDatabaseContext } from '@/contexts/DatabaseContext';
 import { useRegionContext } from '@/contexts/RegionProvider';
 import 'react-native-get-random-values';
@@ -19,9 +19,8 @@ const Map = () => {
   useEffect(() => {firstFillMarkers()}, [])
 
   const handleLongPress = async (e: any) => {
-    alert("Нажато")
     const { latitude, longitude } = e.nativeEvent.coordinate;
-    addMarker(latitude, longitude);
+    await addMarker(latitude, longitude);
     setMarkers(await getMarkers())
   };
 

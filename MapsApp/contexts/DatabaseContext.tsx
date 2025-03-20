@@ -1,7 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { MarkerData, ImageData } from '@/types';
-import { Session } from './ConnectSession';
-import { DataSource } from 'typeorm';
+import React, { createContext, useContext } from 'react';
+import { MarkerData } from '@/models/MarkerData';
+import { ImageData } from '@/models/ImageData';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 interface DatabaseContextType {
   addMarker: (latitude: number, longitude: number) => Promise<void>;
@@ -13,71 +15,57 @@ interface DatabaseContextType {
   getMarkerImages: (markerId: string) => Promise<ImageData[]>;
 }
 
-export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
-    const initDatabase = async () => {
-        Session(async (datasource : DataSource) => {
-            await datasource.initialize();
-        })
+export const TryAction: (action: () => Promise<void>) => Promise<void> = async (action) => {
+    try {
+        await action();
+    } catch (error) {
+        console.error(error);
     }
-    useEffect(() => {initDatabase()}, [])
+}
 
+export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({children}) => {
     const addMarker = async (latitude: number, longitude: number) => {
-        Session(async (datasource : DataSource) => {
-            const markerRepository = datasource.getRepository(MarkerData);
-            const marker = new MarkerData();
-            marker.latitude = latitude;
-            marker.longitude = longitude;
-            await markerRepository.save(marker);
-        })
+        TryAction(async () => {
+            await prisma.markerData.create({
+                data: {
+                    latitude,
+                    longitude,
+                },
+            });
+        });
+        
     }
     const deleteMarker = async (id: string) => {
-        Session(async (datasource : DataSource) => {
-            const imageRepository = datasource.getRepository(ImageData);
-            const markerRepository = datasource.getRepository(MarkerData);
-
-            const images = await imageRepository.find({ where: { markerId: id } });
-            await imageRepository.remove(images);
-
-            const marker = await markerRepository.findOne({ where: { id: id } });
-            if (marker) {
-                await markerRepository.remove(marker);
-            }
-        })
+        await prisma.ImageData.deleteMany({
+            where: {
+                markerId: id,
+            },
+        });
+        await prisma.markerData.delete({
+            where: { id },
+        });
     }
     const getMarkers = async () => {
-        let markers : MarkerData[] = [];
-        Session(async (datasource : DataSource) => {
-            const markerRepository = datasource.getRepository(MarkerData);
-            markers = await markerRepository.find();
-        })
-        return markers;
+        return await prisma.markerData.findMany();
     }
 
     const addImage = async (markerId: string, uri: string) => {
-        Session(async (datasource : DataSource) => {
-            const imageRepository = datasource.getRepository(ImageData);
-            const image = new ImageData();
-            image.url = uri;
-            image.markerId = markerId;
-            await imageRepository.save(image);
-        })
+        await prisma.imageData.create({
+            data: {
+                markerId,
+                uri,
+            },
+        });
     }
     const deleteImage = async (id: string) => {
-        Session(async (datasource : DataSource) => {
-            const imageRepository = datasource.getRepository(ImageData);
-            const image = await imageRepository.findOne({ where: { id: id } });
-            if (image) {
-                await imageRepository.remove(image);
-            }
-        })
+        await prisma.imageData.delete({
+            where: { id },
+        });
     }
     const getMarkerImages = async (markerId: string) => {
-        let images : ImageData[] = [];
-        Session(async (datasource : DataSource) => {
-            const imageRepository = datasource.getRepository(ImageData);
-            images = await imageRepository.find({ where: { markerId: markerId } });
-        })
-        return images;
+        return await prisma.imageData.findMany({
+            where: { markerId },
+        });
     }
 
     return (
@@ -95,4 +83,8 @@ export const useDatabaseContext = () => {
         throw new Error('useDatabaseContext must be used within a DatabaseProvider');
     }
     return context;
+}
+
+function action(prisma: any, any: any) {
+    throw new Error('Function not implemented.');
 }

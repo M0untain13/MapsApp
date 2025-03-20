@@ -3,7 +3,7 @@ import { Text } from 'react-native';
 import MarkerDetailsScreen from '@/components/MarkerDetailsScreen';
 import { useLocalSearchParams } from 'expo-router';
 import { useDatabaseContext } from '@/contexts/DatabaseContext';
-import { MarkerData } from '@/types';
+import { MarkerData } from '@/models/MarkerData';
 
 const MarkerPage = () => {
     const { id } = useLocalSearchParams();

@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import * as ImagePicker from 'expo-image-picker';
 import { View, Text, Image, Button, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { MarkerData } from '@/types';
+import { MarkerData } from '@/models/MarkerData';
 import { useDatabaseContext } from '@/contexts/DatabaseContext';
-import { ImageData } from '@/types';
+import { ImageData } from '@/models/ImageData';
 
 const MarkerDetailsScreen = ({ marker }: { marker: MarkerData }) => {
   const router = useRouter();
