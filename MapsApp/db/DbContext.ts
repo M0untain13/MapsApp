@@ -14,29 +14,51 @@ export class DbContext {
         this.db = drizzle(expo);
     }
 
+    async TryAction(action: () => Promise<any>): Promise<any> {
+        try {
+            await action();
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     async addMarker(marker: typeof markers.$inferInsert) {
-        await this.db.insert(markers).values({id: marker.id, latitude: marker.latitude, longitude: marker.longitude});
+        await this.TryAction(async () => {
+            await this.db.insert(markers).values({ id: marker.id, latitude: marker.latitude, longitude: marker.longitude });
+        })
     };
 
     async deleteMarker(id: string) {
-        await this.db.delete(markers).where(eq(markers.id, id));
+        await this.TryAction(async () => {
+            await this.db.delete(markers).where(eq(markers.id, id));
+        });
     };
 
-    async getMarkers(): Promise<{ id: string; latitude?: number | null | undefined; longitude?: number | null | undefined; }[]>{
-        const result = await this.db.select().from(markers);
+    async getMarkers(): Promise<{ id: string; latitude?: number | null | undefined; longitude?: number | null | undefined; }[]> {
+        let result: any = [];
+        await this.TryAction(async () => {
+            result = await this.db.select().from(markers);
+        });
         return result;
     };
 
     async addImage(image: typeof images.$inferInsert) {
-        await this.db.insert(images).values({id: image.id, markerId: image.markerId, uri: image.uri});
+        await this.TryAction(async () => {
+            await this.db.insert(images).values({ id: image.id, markerId: image.markerId, uri: image.uri });
+        });
     };
 
     async deleteImage(id: string) {
-        await this.db.delete(images).where(eq(images.id, id));
+        await this.TryAction(async () => {
+            await this.db.delete(images).where(eq(images.id, id));
+        });
     };
 
-    async getMarkerImages(markerId: string) : Promise<{ id: string; markerId?: string | null | undefined; uri?: string | null | undefined; }[]>{
-        const result = await this.db.select().from(images).where(eq(images.markerId, markerId));
+    async getMarkerImages(markerId: string): Promise<{ id: string; markerId?: string | null | undefined; uri?: string | null | undefined; }[]> {
+        let result: any = [];
+        await this.TryAction(async () => {
+            result = await this.db.select().from(images).where(eq(images.markerId, markerId));
+        });
         return result;
     };
 }

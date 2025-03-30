@@ -12,7 +12,7 @@ const Index = () => {
     if (!success && error !== undefined) {
       console.error(error);
     }
-  }, [success])
+  }, [success, error])
 
   return (
     <Map />
