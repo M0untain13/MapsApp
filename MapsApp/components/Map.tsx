@@ -39,7 +39,7 @@ const Map = () => {
         {markers.map(marker => (
           <Marker
             key={marker.id}
-            coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
+            coordinate={{ latitude: marker.latitude ?? 0, longitude: marker.longitude ?? 0 }}
             onPress={() => handleMarkerPress(marker)}
           />
         ))}

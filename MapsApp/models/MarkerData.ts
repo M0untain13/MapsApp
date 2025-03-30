@@ -1,16 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { v4 as uuid } from 'uuid'
 
-@Entity()
 export class MarkerData {
-    @PrimaryGeneratedColumn()
     id: string;
-    @Column('int', {nullable:false})
-    latitude: number;
-    @Column('int', {nullable:false})
-    longitude: number;
+    latitude: number | null | undefined;
+    longitude: number | null | undefined;
 
-    constructor(latitude: number, longitude: number) {
+    constructor(latitude: number| null | undefined, longitude: number | null | undefined) {
         this.id = uuid()
         this.latitude = latitude;
         this.longitude = longitude;

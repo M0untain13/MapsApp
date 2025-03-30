@@ -9,12 +9,12 @@ const MarkerPage = () => {
     const { id } = useLocalSearchParams();
     const markerId = Array.isArray(id) ? id[0] : id;
     const [ marker, setMarker ] = useState<MarkerData | undefined>(undefined);
-    let isLoading = true;
+    const [ isLoading, setIsLoading ] = useState<boolean>(true);
     const { getMarkers } = useDatabaseContext();
 
     const firstFillMarkers = async () => {
         setMarker((await getMarkers()).find(marker => marker.id === markerId));
-        isLoading = false;
+        setIsLoading(false);
     }
     useEffect(() => {firstFillMarkers()}, [])
 

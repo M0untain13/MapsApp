@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as ImagePicker from 'expo-image-picker';
-import { View, Text, Image, Button, StyleSheet } from 'react-native';
+import { View, Text, Image, Button, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MarkerData } from '@/models/MarkerData';
 import { useDatabaseContext } from '@/contexts/DatabaseContext';
@@ -11,10 +11,10 @@ const MarkerDetailsScreen = ({ marker }: { marker: MarkerData }) => {
   const [images, setImages] = useState<ImageData[]>([]);
   const { deleteMarker, addImage, deleteImage, getMarkerImages } = useDatabaseContext();
 
-  const firstFillImages = async () => {
+  const fillImages = async () => {
     setImages(await getMarkerImages(marker.id));
   }
-  useEffect(() => {firstFillImages()}, [])
+  useEffect(() => { fillImages() }, [])
 
   const getImageFromPicker = async () => {
     if (marker) {
@@ -36,12 +36,19 @@ const MarkerDetailsScreen = ({ marker }: { marker: MarkerData }) => {
           await addImage(marker.id, asset.uri);
         }
       })
+
+      await fillImages();
     }
   }
-  
+
   const deleteMarkerHandler = async () => {
     await deleteMarker(marker.id);
     router.push('/');
+  }
+
+  const doDeleteImage = async (id: string) => {
+    await deleteImage(id)
+    await fillImages();
   }
 
   return (
@@ -51,12 +58,14 @@ const MarkerDetailsScreen = ({ marker }: { marker: MarkerData }) => {
         <Text>Долгота: {marker.longitude}</Text>
       </View>
       <View style={styles.imagesContainer}>
-        {images.map(image => (
-          <View key={image.id} style={styles.imageContainer}>
-            <Image source={{ uri: image.url }} style={styles.image} />
-            <Button title="Удалить изображение" onPress={() => deleteImage(image.id)} />
-          </View>
-        ))}
+        <ScrollView>
+          {images.map(image => (
+            <View key={image.id} style={styles.imageContainer}>
+              <Image source={{ uri: image.url ?? "" }} style={styles.image} />
+              <Button title="Удалить изображение" onPress={() => doDeleteImage(image.id)} />
+            </View>
+          ))}
+        </ScrollView>
       </View>
       <View style={styles.buttonsContainer}>
         <Button title="Добавить изображение" onPress={getImageFromPicker} />
@@ -88,9 +97,12 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   buttonsContainer: {
-    flexDirection: 'row',
+    flexDirection: 'column', // изменено с 'row' на 'column'
     justifyContent: 'space-around',
     padding: 16,
+  },
+  deleteButton: {
+    backgroundColor: 'red', // добавлено
   },
 });
 
