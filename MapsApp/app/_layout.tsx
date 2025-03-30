@@ -1,16 +1,14 @@
+import "reflect-metadata";
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import 'react-native-reanimated';
-
 import { useColorScheme } from '@/hooks/useColorScheme';
-
-import Map from '@/components/Map';
-import { MarkerProvider } from '@/components/MarkerProvider';
-import { RegionProvider } from '@/components/RegionProvider';
+import { DatabaseProvider } from '@/contexts/DatabaseContext';
+import { RegionProvider } from '@/contexts/RegionProvider';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -33,7 +31,7 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <MarkerProvider>
+      <DatabaseProvider>
         <RegionProvider>
           <Stack>
             <Stack.Screen name="index" options={{ title: 'Карта' }} />
@@ -41,7 +39,7 @@ export default function RootLayout() {
             <StatusBar style="auto" />
           </Stack>
         </RegionProvider>
-      </MarkerProvider>
+      </DatabaseProvider>
     </ThemeProvider>
   );
 }

@@ -1,22 +1,27 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { useRouter } from 'expo-router';
-import { MarkerData } from '@/types';
-import { useMarkerContext } from '@/components/MarkerProvider';
-import { useRegionContext } from './RegionProvider';
+import { MarkerData } from '@/models/MarkerData';
+import { useDatabaseContext } from '@/contexts/DatabaseContext';
+import { useRegionContext } from '@/contexts/RegionProvider';
 import 'react-native-get-random-values';
-import { v4 as uuid } from 'uuid'
 
 const Map = () => {
   const router = useRouter();
-  const { markers, setMarkers } = useMarkerContext();
   const { region, setRegion } = useRegionContext();
+  const [ markers, setMarkers ] = useState<MarkerData[]>([]);
+  const { addMarker, getMarkers } = useDatabaseContext();
 
-  const handleLongPress = (e: any) => {
+  const firstFillMarkers = async () => {
+    setMarkers(await getMarkers());
+  }
+  useEffect(() => {firstFillMarkers()}, [])
+
+  const handleLongPress = async (e: any) => {
     const { latitude, longitude } = e.nativeEvent.coordinate;
-    const newMarker: MarkerData = { id: uuid(), latitude, longitude, images: [] };
-    setMarkers([...markers, newMarker]);
+    await addMarker(latitude, longitude);
+    setMarkers(await getMarkers())
   };
 
   const handleMarkerPress = (marker: MarkerData) => {
@@ -34,7 +39,7 @@ const Map = () => {
         {markers.map(marker => (
           <Marker
             key={marker.id}
-            coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
+            coordinate={{ latitude: marker.latitude ?? 0, longitude: marker.longitude ?? 0 }}
             onPress={() => handleMarkerPress(marker)}
           />
         ))}

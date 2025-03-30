@@ -1,25 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text } from 'react-native';
 import MarkerDetailsScreen from '@/components/MarkerDetailsScreen';
 import { useLocalSearchParams } from 'expo-router';
-import { useMarkerContext } from '@/components/MarkerProvider';
+import { useDatabaseContext } from '@/contexts/DatabaseContext';
+import { MarkerData } from '@/models/MarkerData';
 
 const MarkerPage = () => {
     const { id } = useLocalSearchParams();
     const markerId = Array.isArray(id) ? id[0] : id;
+    const [ marker, setMarker ] = useState<MarkerData | undefined>(undefined);
+    const [ isLoading, setIsLoading ] = useState<boolean>(true);
+    const { getMarkers } = useDatabaseContext();
 
-    const { markers } = useMarkerContext();
-    const marker = markers.find(marker => marker.id === markerId);
+    const firstFillMarkers = async () => {
+        setMarker((await getMarkers()).find(marker => marker.id === markerId));
+        setIsLoading(false);
+    }
+    useEffect(() => {firstFillMarkers()}, [])
 
-    if (!marker) {
+    if (isLoading) {
         return (
-            <Text>Маркер не найден...</Text>
+            <Text>Загрузка...</Text>
         );
     }
     else {
-        return (
-            <MarkerDetailsScreen marker={marker} />
-        );
+        if(!marker){
+            return (
+                <Text>Маркер не найден!</Text>
+            );
+        } else {
+            return (
+                <MarkerDetailsScreen marker={marker} />
+            );
+        }
     }
 };
 
