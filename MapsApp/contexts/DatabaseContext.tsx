@@ -60,7 +60,7 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         const context = new DbContext();
         return (await context.getMarkerImages(markerId)).map(
             (e) => {
-                var image = new ImageData(e.markerId, e.uri);
+                var image = new ImageData(e.uri, e.markerId);
                 image.id = e.id;
                 return image;
             }

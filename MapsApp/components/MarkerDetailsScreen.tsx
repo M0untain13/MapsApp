@@ -61,7 +61,7 @@ const MarkerDetailsScreen = ({ marker }: { marker: MarkerData }) => {
         <ScrollView>
           {images.map(image => (
             <View key={image.id} style={styles.imageContainer}>
-              <Image source={{ uri: image.url ?? "" }} style={styles.image} />
+              <Image source={{ uri: image.uri ?? "" }} style={styles.image} />
               <Button title="Удалить изображение" onPress={() => doDeleteImage(image.id)} />
             </View>
           ))}

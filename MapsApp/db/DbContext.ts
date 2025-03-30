@@ -15,7 +15,7 @@ export class DbContext {
     }
 
     async addMarker(marker: typeof markers.$inferInsert) {
-        await this.db.insert(markers).values(marker);
+        await this.db.insert(markers).values({id: marker.id, latitude: marker.latitude, longitude: marker.longitude});
     };
 
     async deleteMarker(id: string) {
@@ -28,7 +28,7 @@ export class DbContext {
     };
 
     async addImage(image: typeof images.$inferInsert) {
-        await this.db.insert(images).values(image);
+        await this.db.insert(images).values({id: image.id, markerId: image.markerId, uri: image.uri});
     };
 
     async deleteImage(id: string) {
